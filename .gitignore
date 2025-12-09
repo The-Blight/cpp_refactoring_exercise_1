@@ -3,3 +3,4 @@ cmake-build-*/
 
 #JetBrains
 .idea/
+.clang-format

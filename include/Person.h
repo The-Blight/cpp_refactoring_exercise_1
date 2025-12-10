@@ -1,53 +1,66 @@
-#ifndef UNIVERSITY_PERSON_H
-#define UNIVERSITY_PERSON_H
-
+#pragma once
 #include <string>
+#include <utility>
+#include  <memory>
 
 #include "Date.h"
 #include "Exceptions.h"
-using namespace std;
-
-enum Sex { M, F };
 
 
 class Person {
-private:
-    string _last_name;
-    string _first_name;
-    Date* _date_of_birth;
-    Sex _sex;
-
 public:
-    Person(const string& last_name, const string& first_name, Date* date_of_birth, Sex sex)
-        : _last_name(last_name),
-          _first_name(first_name),
-          _date_of_birth(date_of_birth),
-          _sex(sex) {
-    }
-    ~Person() {
-        delete _date_of_birth;
-    }
+  enum class SEX { M, F };
 
-    string get_last_name() const {
-        return _last_name;
-    }
+  explicit Person(std::string& last_name, std::string& first_name, Date* date_of_birth,
+                  const SEX sex)
+    : last_name_(std::move(checkSurname(last_name))),
+      first_name_(std::move(checkName(first_name))),
+      date_of_birth_(date_of_birth),
+      sex_(sex) {
+  }
 
-    string get_first_name() const {
-        return _first_name;
-    }
+  [[nodiscard]] std::string getLastname() const {
+    return last_name_;
+  }
 
-    Date* get_date_of_birth() const {
-        return _date_of_birth;
-    }
+  [[nodiscard]] std::string getFirstName() const {
+    return first_name_;
+  }
 
-    Sex get_sex() const {
-        return _sex;
+  [[nodiscard]] Date getDateOfBirth() const {
+    if (date_of_birth_ != nullptr) {
+      return *date_of_birth_;
     }
+    throw errors::NullPointerError("Object 'date of birth' points to null pointer");
+  }
 
-    string get_full_name() const {
-        return get_last_name() + " " + get_first_name();
+  [[nodiscard]] SEX getSex() const {
+    return sex_;
+  }
+
+  [[nodiscard]] std::string getFullName() const {
+    return getLastname() + " " + getFirstName();
+  }
+
+  ~Person() = default;
+
+private:
+  std::string last_name_;
+  std::string first_name_;
+  std::unique_ptr<Date> date_of_birth_;
+  SEX sex_;
+
+  [[nodiscard]] static std::string checkName(const std::string& name) {
+    if (!name.empty()) {
+      return name;
     }
+    throw errors::NameError("Name is empty");
+  }
+
+  [[nodiscard]] static std::string checkSurname(const std::string& surname) {
+    if (!surname.empty()) {
+      return surname;
+    }
+    throw errors::SurnameError("Surname is empty");
+  }
 };
-
-
-#endif //UNIVERSITY_PERSON_H

@@ -1,43 +1,37 @@
-#ifndef UNIVERSITY_TEACHER_H
-#define UNIVERSITY_TEACHER_H
+#pragma once
 
 #include <string>
 #include <vector>
 
 #include "Person.h"
+#include "Date.h"
 
-using namespace std;
 
 class Teacher : public Person {
-private:
-    vector<string>* _subjects;
-    string _faculty;
-
 public:
-    Teacher(const string& last_name, const string& first_name, Date* date_of_birth, Sex sex, const string& faculty)
-        : Person(last_name, first_name, date_of_birth, sex),
-          _faculty(faculty) {
-        _subjects = new vector<string>();
-    }
+  explicit Teacher(std::string& last_name, std::string& first_name, Date* date_of_birth,
+                   const SEX sex,
+                   std::string& faculty)
+    : Person(last_name, first_name, date_of_birth, sex),
+      subjects_(std::make_unique<std::vector<std::string> >()),
+      faculty_(std::move(faculty)) {
+  }
 
-    ~Teacher() {
-        delete _subjects;
+  void addSubject(const std::string& subject) {
+    subjects_->push_back(subject);
+  }
 
-        ~Person();
-    }
+  [[nodiscard]] std::vector<std::string> getSubjects() const {
+    return *subjects_;
+  }
 
-    void add_subject(const string& subject) {
-        _subjects->push_back(subject);
-    }
+  [[nodiscard]] std::string getFaculty() const {
+    return faculty_;
+  }
 
-    vector<string>* get_subjects() const {
-        return _subjects;
-    }
+  ~Teacher() = default;
 
-    string get_faculty() const {
-        return _faculty;
-    }
+private:
+  std::unique_ptr<std::vector<std::string> > subjects_;
+  std::string faculty_;
 };
-
-
-#endif //UNIVERSITY_TEACHER_H
